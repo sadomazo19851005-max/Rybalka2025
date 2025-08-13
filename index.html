@@ -4,23 +4,70 @@
 <meta charset="UTF-8">
 <title>Java Game</title>
 <style>
-html, body { margin:0; padding:0; background:#000; height:100%; overflow:hidden; }
-canvas { display:block; margin:auto; background:#000; }
+html, body {
+    margin: 0;
+    padding: 0;
+    background: #000;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    font-family: sans-serif;
+}
+#startBtn {
+    padding: 15px 30px;
+    font-size: 18px;
+    background: #1a73e8;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    cursor: pointer;
+}
+#startBtn:hover {
+    background: #1558b0;
+}
+#loadingText {
+    font-size: 18px;
+    text-align: center;
+}
+canvas {
+    display: block;
+    margin: auto;
+    background: #000;
+}
 </style>
 </head>
 <body>
+<button id="startBtn">Запустить игру</button>
+<div id="loadingText" style="display:none;">Загрузка...</div>
+
 <script src="https://cdn.jsdelivr.net/gh/hex007/freej2me-web@latest/freej2me.js"></script>
 <script>
-// Автозагрузка игры
-window.onload = function() {
-    var file = 'putevod.jar';
-    fetch(file).then(r => r.arrayBuffer()).then(buf => {
-        var blob = new Blob([buf], { type: 'application/java-archive' });
-        var fileObj = new File([blob], file);
-        FreeJ2ME.runMidletFile(fileObj);
+document.getElementById("startBtn").addEventListener("click", function() {
+    this.remove(); // убираем кнопку
+    document.getElementById("loadingText").style.display = "block"; // показываем "Загрузка..."
+
+    fetch('putevod.jar')
+    .then(response => response.arrayBuffer())
+    .then(buffer => {
+        let blob = new Blob([buffer], { type: 'application/java-archive' });
+        let file = new File([blob], 'putevod.jar');
+
+        // Создаём canvas для игры
+        let canvas = document.createElement("canvas");
+        canvas.id = "canvas";
+        document.body.innerHTML = ""; // убираем текст загрузки
+        document.body.appendChild(canvas);
+
+        FreeJ2ME.runMidletFile(file);
+    })
+    .catch(err => {
+        document.getElementById("loadingText").textContent = "Ошибка загрузки игры";
+        console.error("Ошибка загрузки JAR:", err);
     });
-};
+});
 </script>
-<canvas id="canvas"></canvas>
 </body>
 </html>
